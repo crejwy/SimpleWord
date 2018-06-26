@@ -1,0 +1,43 @@
+<head>
+<link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css" >
+<link href="./icheck-1.x/skins/all.css" rel="stylesheet">
+<style>
+.inline-block{
+	display:inline-block;
+}
+.page{
+	position:relative;
+	padding:10px 20px;
+}
+</style>
+
+<script src="./scripts/jquery-1.10.2.min.js"></script>
+<script src="./scripts/handlebars-v4.0.11.js"></script>
+<script src="./scripts/handlebarsExtend.js"></script>
+<script src="./icheck-1.x/icheck.min.js"></script>
+<script type="text/javascript">
+	function addNewPage(){
+		
+		$("#canvas").append('<div class="page" style="width:600px;height:800px;background:#fff;margin: 10 auto;"></div>')
+	}
+	$(function(){
+	
+		$(document).on("click",".page",function(e){
+		console.log(e.target);
+			$(this).append('<input type="text" style="width:100%;height:20px;background:red;"/>');
+		});
+	});
+</script>
+</head>
+<body style="margin:0">
+
+
+<div  id="canvas"  style="left:0;top:0;margin:0;width:80%;height:100%;background:beige;float:left;overflow:auto;">
+
+</div>
+<div id="setting" style="top:0;width:20%;height:100%;position:fixed;right:0;background:gainsboro;">
+<span class="inline-block" style="line-height:30px;width:100px;border:solid 1px;color:#fff;background:blue;">Simple Word</span>
+<button onclick="addNewPage();">+ÐÂÔö</button>
+</div>
+
+</body>
