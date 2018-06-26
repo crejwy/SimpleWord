@@ -1,17 +1,18 @@
 ﻿;(function ($) {
     var compiled = {};
-    $.fn.handlebarsAfter = function (template, data) {
+    
+    $.fn.handlebars = function (template, data,oper) {
         if (template instanceof jQuery) {
             template = $(template).html();
         }
         compiled[template] = Handlebars.compile(template);
-        this.after(compiled[template](data));
-    };
-    $.fn.handlebars = function (template, data) {
-        if (template instanceof jQuery) {
-            template = $(template).html();
-        }
-        compiled[template] = Handlebars.compile(template);
-        this.html(compiled[template](data));
+		if(oper==undefined){
+			this.html(compiled[template](data));
+		}else if(oper=="after"){
+			this.after(compiled[template](data));
+		}else if(oper=="append"){
+			this.append(compiled[template](data));
+		}
+        
     };
 })(jQuery);

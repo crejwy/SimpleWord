@@ -6,8 +6,34 @@
 	display:inline-block;
 }
 .page{
-	position:relative;
+	width:600px;
+	height:800px;
+	background:#fff;
+	margin: 10 auto;
+	position: relative;
+	overflow: hidden;
 	padding:10px 20px;
+}
+.page:focus{
+	outline: none !important;
+}
+table{
+	table-layout:fixed;
+	empty-cells:show; 
+	border-collapse: collapse;
+	margin:0 auto;
+	width: 100%;
+}
+table:hover{
+	outline:red 1px solid;
+}
+.border{
+	border:1px solid ;
+}
+
+td,th{
+	height:30px;
+	width:100px;
 }
 </style>
 
@@ -16,28 +42,178 @@
 <script src="./scripts/handlebarsExtend.js"></script>
 <script src="./icheck-1.x/icheck.min.js"></script>
 <script type="text/javascript">
-	function addNewPage(){
-		
-		$("#canvas").append('<div class="page" style="width:600px;height:800px;background:#fff;margin: 10 auto;"></div>')
+	function addNewElement(){		
+		var elename=$("#s_newelement").val();	
+		var data={id:new Date().getTime(),style:""};		
+		data.style+='background-color:'+$("#s_backgroundcolor").val();
+		if(elename=="page"){			
+			addNewPage(data);
+		}else if(elename=="table"&&$(".page.active").length>0){
+			var  rows=$("#s_rows").val();
+			var  tds=$("#s_tds").val();
+			data.rows=[];
+			for(i=0;i<rows;i++){
+				var $tds=[];
+				for(j=0;j<tds;j++){
+					$tds.push({pos:"#"+data.id+" "+"row:eq("+i+") "+"td:eq("+j+")"});
+				}
+				data.rows.push({pos:"#"+data.id+" "+"row:eq("+i+")",tds:$tds});				
+			}
+			addNewTable(data);
+		}
 	}
-	$(function(){
+	function addNewPage(data){		
+		$("#canvas").handlebars($("#tpl-page").html(),data,"append");		
+	}
+	function addNewTable(data){		
+		$(".page.active").handlebars($("#tpl-table").html(),data,"append");		
+	}
 	
+	var handleHelper = Handlebars.registerHelper("addOne",function(index){
+         //利用+1的时机，在父级循环对象中添加一个_index属性，用来保存父级每次循环的索引
+         this._parentindex = index;
+         //返回+1之后的结果
+         return this._index+1;
+    });
+	
+	
+	var target_click="";
+	$(function(){	
 		$(document).on("click",".page",function(e){
-		console.log(e.target);
-			$(this).append('<input type="text" style="width:100%;height:20px;background:red;"/>');
+			$(".page.active").removeClass("active");
+			$(this).addClass("active");
+			$(".target_click").removeClass("target_click");
+			$(e.target).addClass("target_click");
+			$("#s_target").val(e.target);
+			
 		});
+		
+		$(document).on("click",".page",function(e){
+			$(".page.active").removeClass("active");
+			$(this).addClass("active");
+			$(".target_click").removeClass("target_click");
+			$(e.target).addClass("target_click");
+			$("#s_target").val(e.target);
+		});
+		
+		$("#s_position,#s_backgroundcolor").change(function(){
+			$(".target_click").css({
+				"position":$("#s_position").val(),
+				"background-color":$("#s_backgroundcolor").val()
+			});
+		})
+		
+		 // 定义最后光标对象
+        <!-- var lastEditRange; -->
+
+        // 编辑框点击事件
+
+		<!-- $(document).on("mouseup",".page",function() { -->
+			<!-- console.log("------------onclick------------"); -->
+            <!-- // 获取选定对象 -->
+            <!-- var selection = getSelection() -->
+			<!-- console.log(selection); -->
+            <!-- // 设置最后光标对象 -->
+            <!-- <!-- lastEditRange = selection.getRangeAt(0) --> -->
+        <!-- }); -->
+		
+		 <!-- // 编辑框按键弹起事件 -->
+		<!-- $(document).on("keyup","span",function() { -->
+			<!-- console.log("------------onkeyup------------"); -->
+            <!-- // 获取选定对象 -->
+            <!-- var selection = getSelection() -->
+			<!-- console.log(selection); -->
+            <!-- // 设置最后光标对象 -->
+            <!-- <!-- lastEditRange = selection.getRangeAt(0) --> -->
+        <!-- }); -->
+
+        
 	});
 </script>
 </head>
 <body style="margin:0">
-
+<script id="tpl-page" type="text/html">
+	<div id="{{id}}" class="page" contenteditable=true style="{{style}}" >
+		<div><span style="color:red;" >xxx</span><span style="color:blue;">xxxxxxxxxxx</span></div>
+		<table>
+			<tr>
+				<td width=100>a</td>
+				<td width=100>d</td>
+				<td width=100>c</td>
+			</tr>
+			<tr>
+				<td width=100>a</td>
+				<td width=100>d</td>
+				<td width=100>c</td>
+			</tr>
+		</table>
+	</div>
+</script>
+<script id="tpl-table" type="text/html">
+	<table style="{{style}}" id="{{id}}" >
+		<tbody>
+			{{#each rows}}
+				<tr pos="{{pos}}">
+					{{#each tds}}
+						<td pos="{{pos}}" class="border"></td>
+					{{/each}}
+				</tr>
+			{{/each}}
+		</tbody>
+	</table>
+</script>
+<script id="tpl-input" type="text/html">
+	<div contenteditable=true style="width:100%;height:20px;background:red;"/>
+</script>
 
 <div  id="canvas"  style="left:0;top:0;margin:0;width:80%;height:100%;background:beige;float:left;overflow:auto;">
 
 </div>
 <div id="setting" style="top:0;width:20%;height:100%;position:fixed;right:0;background:gainsboro;">
 <span class="inline-block" style="line-height:30px;width:100px;border:solid 1px;color:#fff;background:blue;">Simple Word</span>
-<button onclick="addNewPage();">+新增</button>
+<!-- <input id="s_newelement" type="text" list="s_newelement_list"/> -->
+<select id="s_newelement">
+<option value="page" selected="">page</option>
+<option value="table">table</option>
+</select>
+<button onclick="addNewElement();">+新增</button>
+
+
+
+
+<div>
+target:
+<input id="s_target" type="text" />
+<div>
+<div>
+position:
+<select id="s_position">
+	<option value="relative" selected="">relative</option>
+	<option value="absolute">absolute</option>
+</select>
+<div>
+
+<div>
+background-color:
+<select id="s_backgroundcolor">
+	<option value="white" style="background-color:#fff" selected="">white</option>
+	<option value="red" style="background-color:red">red</option>
+	<option value="blue" style="background-color:blue">blue</option>
+	<option value="black" style="background-color:black">black</option>
+</select>
+<div>
+
+<div>
+行数:<input id="s_rows" type="number" min="1"  required/>
+列数:<input id="s_tds"type="number" min="1" required/>
+<div>
+<div>
+位置:
+top:<input id="s_top" type="text"/>
+left:<input id="s_left"type="text"/>
+<div>
+
+
 </div>
 
 </body>
