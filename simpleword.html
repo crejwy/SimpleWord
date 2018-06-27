@@ -14,6 +14,13 @@
 	overflow: hidden;
 	padding:10px 20px;
 }
+.active{
+	outline:solid 1px #e2e2e2;
+}
+.active:after{
+
+}
+
 .page:focus{
 	outline: none !important;
 }
@@ -35,6 +42,19 @@ td,th{
 	height:30px;
 	width:100px;
 }
+.active-wrapper-arow{
+	position:relative;
+	width:100%;
+}
+.active-wrapper-arow>span{
+	width:5px;
+	height:5px;	
+	position:absolute;
+	right:0;
+	margin:-5px 5px 0 0;
+}
+
+
 </style>
 
 <script src="./scripts/jquery-1.10.2.min.js"></script>
@@ -48,7 +68,7 @@ td,th{
 		data.style+='background-color:'+$("#s_backgroundcolor").val();
 		if(elename=="page"){			
 			addNewPage(data);
-		}else if(elename=="table"&&$(".page.active").length>0){
+		}else if(elename=="table"&&$(".panel.active").length>0){
 			var  rows=$("#s_rows").val();
 			var  tds=$("#s_tds").val();
 			data.rows=[];
@@ -75,26 +95,35 @@ td,th{
          //返回+1之后的结果
          return this._index+1;
     });
+	function UnActiveDiv(){
+		var $div=$(".activewrapper").parent();
+		if($div){
+			$div.html($(".activewrapper .wrapcontent").html());
+		}
+	}
+	
+	function ActiveDiv($ele){
+		if($ele[0].tagName.toLowerCase()=="div"&&$ele.children(".activewrapper").length==0){
+			UnActiveDiv();
+			$ele.wrapInner("<div class='wrapcontent'></div>");
+			$ele.find(".wrapcontent").wrapInner("<div class='activewrapper'></div>")
+			.before('<div class=".active-wrapper-arow"><span><i class="fa fa-arrows"></i></span><div>');
+		}
+	}
 	
 	
 	var target_click="";
 	$(function(){	
-		$(document).on("click",".page",function(e){
-			$(".page.active").removeClass("active");
-			$(this).addClass("active");
-			$(".target_click").removeClass("target_click");
-			$(e.target).addClass("target_click");
-			$("#s_target").val(e.target);
-			
-		});
 		
 		$(document).on("click",".page",function(e){
-			$(".page.active").removeClass("active");
-			$(this).addClass("active");
+			var $active=$(".page.active");
+			$active.removeClass("active");
+			$(this).addClass("active");			
 			$(".target_click").removeClass("target_click");
 			$(e.target).addClass("target_click");
 			$("#s_target").val(e.target);
 		});
+
 		
 		$("#s_position,#s_backgroundcolor").change(function(){
 			$(".target_click").css({
@@ -133,20 +162,8 @@ td,th{
 </head>
 <body style="margin:0">
 <script id="tpl-page" type="text/html">
-	<div id="{{id}}" class="page" contenteditable=true style="{{style}}" >
-		<div><span style="color:red;" >xxx</span><span style="color:blue;">xxxxxxxxxxx</span></div>
-		<table>
-			<tr>
-				<td width=100>a</td>
-				<td width=100>d</td>
-				<td width=100>c</td>
-			</tr>
-			<tr>
-				<td width=100>a</td>
-				<td width=100>d</td>
-				<td width=100>c</td>
-			</tr>
-		</table>
+	<div id="{{id}}" class="page"  style="{{style}}" >
+		
 	</div>
 </script>
 <script id="tpl-table" type="text/html">
